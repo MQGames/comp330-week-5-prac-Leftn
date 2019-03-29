@@ -29,7 +29,7 @@ uniform vec4 u_colour;
 void main() {
     // set the fragment colour
 
-    gl_FragColor = u_colour; 
+    gl_FragColor = u_colour;
 }
 `;
 
@@ -113,13 +113,44 @@ function main() {
     // create a solar system
 
     const yellow = [1,1,0,1];               // Yellow = Red + Green
-    const sun = new Circle(yellow);
+    const blue = [0,0,1,1];
+    const grey = [0.5, 0.5, 0.5,1];
+    const red = [1,0.2,0.2,1];
 
+    const sun = new Circle(yellow);
+    const sun_pivot = new gameObject()
+    sun_pivot.parent = sun;
+
+    const earth_pivot = new gameObject();
+    earth_pivot.parent = sun_pivot;
+    earth_pivot.translation = [5, 0];
+    earth_pivot.scale = 0.5;
+
+    const earth = new Circle(blue);
+    earth.scale = 1;
+    earth.translation = [0, 0];
+    earth.parent = earth_pivot;
+
+    const moon_pivot = new gameObject();
+    moon_pivot.translation = [0, 0];
+    moon_pivot.parent = earth_pivot;
+
+    const moon = new Circle(grey);
+    moon.scale = 0.3;
+    moon.translation = [0, 2];
+    moon.parent = moon_pivot;
+
+    const day = 1; //seconds
+    const year = 30;
+    const month = 10;
     // === Per Frame operations ===
 
     // update objects in the scene
     let update = function(deltaTime) {
-        
+        earth.rotation += Math.PI * 2 * deltaTime/day;
+        moon_pivot.rotation += Math.PI * 2 * deltaTime/month;
+        sun_pivot.rotation += Math.PI * 2 * deltaTime/year;
+
     };
 
     // redraw the scene
@@ -136,7 +167,8 @@ function main() {
         gl.uniformMatrix3fv(viewMatrixUniform, false, viewMatrix);
 
         // render everything
-        sun.renderSelf(gl, colourUniform);
+        gl.uniformMatrix3fv(worldMatrixUniform, false, Matrix.identity());
+        sun.render(gl, worldMatrixUniform, colourUniform, Matrix.identity());
     };
 
     // animation loop

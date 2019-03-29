@@ -94,6 +94,5 @@ class Matrix {
 
         return v2;
     }
-
 }
 
